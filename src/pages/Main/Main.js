@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col } from 'reactstrap';
+import ArrowKeysReact from 'arrow-keys-react';
 import './styles.css';
 
 // https://digitalsynopsis.com/design/beautiful-color-palettes-combinations-schemes/
@@ -21,15 +22,96 @@ const Cell = (props) =>{
 
 class Main extends Component {
     constructor(props) {
-        super(props);
+        super(props);        
 
         this.state = {
             renderMaze: false,
-            cellsArray: []
+            cellsArray: [],
+            currentCell: {},
+            won: false
+        }
+
+        ArrowKeysReact.config({
+            left: () => {
+                this.handleKeyLeft();              
+            },
+            right: () => {
+                this.handleKeyRight();
+            },
+            up: () => {
+                this.handleKeyUp();
+            },
+            down: () => {
+                this.handleKeyDown();
+            }
+          });
+    }
+
+    finishGame() {
+        this.setState({ won: true });
+
+        setTimeout(() => {
+            this.buildMaze();
+            this.setState({ won: false });
+        }, 1000);
+    }
+
+    updateMaze(previousIndex, nextIndex) {
+        var maze = this.state.cellsArray;
+        var newCurrentCell = null;
+
+        for (var i = 0; i < maze.length; i++) {
+            var currentRow = maze[i];
+            for (var j = 0; j < currentRow.length; j++) {
+                if (maze[i][j].index === previousIndex) {
+                    maze[i][j].player = false;
+                }
+
+                if (maze[i][j].index === nextIndex) {
+                    maze[i][j].player = true;
+                    newCurrentCell = maze[i][j];
+                }
+            }
+        }
+
+        if (newCurrentCell.player && newCurrentCell.type === "end") {
+            this.setState({ cellsArray: maze });
+            this.finishGame();
+        } else {
+            this.setState({ cellsArray: maze, currentCell: newCurrentCell });
+        }        
+
+    }
+
+    handleKeyDown() {
+        const currentCell = this.state.currentCell;
+        if (currentCell.bottom === " ") {
+            this.updateMaze(currentCell.index, currentCell.bottomIndex);
         }
     }
 
-    componentDidMount() {
+    handleKeyUp() {
+        const currentCell = this.state.currentCell;
+        if (currentCell.top === " ") {
+            this.updateMaze(currentCell.index, currentCell.topIndex);
+        }
+    }
+
+    handleKeyLeft() {
+        const currentCell = this.state.currentCell;
+        if (currentCell.left === " ") {
+            this.updateMaze(currentCell.index, currentCell.leftIndex);
+        }
+    }
+
+    handleKeyRight() {
+        const currentCell = this.state.currentCell;
+        if (currentCell.right === " ") {
+            this.updateMaze(currentCell.index, currentCell.rightIndex);
+        }
+    }
+    
+    buildMaze() {
         fetch('http://34.210.35.174:3001/?w=5&h=5')
             .then(response => {
                 return response.text();
@@ -65,8 +147,6 @@ class Main extends Component {
                     mazeArray.push(newRow);
                 }
 
-                //console.log(mazeArray);
-
                 // traverse array
                 var cellsArray = [];
                 var index = 0;
@@ -98,18 +178,45 @@ class Main extends Component {
                     }                    
                 }
 
-                console.log(cellsArray);
+                for (var i = 0; i < cellsArray.length; i++) {
+                    var currentRow = cellsArray[i];
+                    for (var j = 0; j < currentRow.length; j++) {
+                        try { cellsArray[i][j].topIndex = cellsArray[i-1][j].index; } 
+                        catch (error) { cellsArray[i][j].topIndex = null; }
+
+                        try { cellsArray[i][j].bottomIndex = cellsArray[i+1][j].index; } 
+                        catch (error) { cellsArray[i][j].bottomIndex = null; }
+
+                        try { cellsArray[i][j].leftIndex = cellsArray[i][j-1].index; } 
+                        catch (error) { cellsArray[i][j].leftIndex = null; }
+
+                        try { cellsArray[i][j].rightIndex = cellsArray[i][j+1].index; } 
+                        catch (error) { cellsArray[i][j].rightIndex = null; }
+                    }
+                }
+
                 this.setState({ cellsArray, renderMaze: true });
-            })        
+                this.setState({ currentCell: cellsArray[0][0] });
+            })
+    }
+
+    componentDidMount() {
+        window.addEventListener("keydown", function(e) {
+            if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+                e.preventDefault();
+            }
+        }, false);    
+        
+        this.buildMaze();
     }
 
     render() {
         return (
-            <div className="wrapper">
+            <div {...ArrowKeysReact.events} tabIndex="1" className="wrapper">
                 {this.state.renderMaze && <Container style={{
                     width: '100vh',
                     height: '100vh',
-                    padding: '40px',
+                    padding: '70px',
                     margin: '40px',
                     backgroundColor: '#251e3e',
                     boxShadow: '10px 10px #1a162b',
@@ -177,7 +284,8 @@ class Main extends Component {
                     </Row>
                     
                 </Container>}
-                {!this.state.renderMaze && <div>Loading</div>}
+                {!this.state.renderMaze && <div>Loading...</div>}
+                { this.state.won && <div className="won">You Won!</div> }
             </div>
         );
     }

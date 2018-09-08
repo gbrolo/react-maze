@@ -3,7 +3,6 @@
     padding: 0;
     background-color: #051e3e;
     width: 100%;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,6 +10,22 @@
     align-items: center;
     text-align: center;
     color: #fff;
+}
+
+.won {
+    position: absolute;
+    width: 50%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 5em;
+    text-transform: uppercase;
+    background-color: #051e3e;
+    border-radius: 10px;
 }
 
 .cell {
@@ -26,29 +41,42 @@
 
 .player {
     padding: 0;
+    z-index: 5;
 }
 
 .player::after {
     content: '';
     background-color: #fff;
-    width: 50%;
-    height: 50%;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: solid 2px #1a162b;
+    z-index: 5;
+    position: absolute;
 }
 
 .start-cell {
-    background-color: #051e3e;
+    padding: 0;
 }
 
-.end-cell {
-    background-color: #851e3e;
-    font-size: 2.5em;
-    text-shadow: 3px 4px 1px #1a162b;
+.start-cell::before {
+    content: '';
+    background-color: #051e3e;
+    width: 50px;
+    height: 50px;
+    transform: rotate(45deg);
+}
+
+.end-cell {    
+    padding: 0;
 }
 
 .end-cell::after {
-    content: 'G';
+    content: '';
+    width: 50px;
+    height: 50px;
+    background-color: #851e3e;
+    transform: rotate(45deg);
 }
 
 .top-wall {
