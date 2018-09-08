@@ -12,3 +12,57 @@
     text-align: center;
     color: #fff;
 }
+
+.cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    margin: 0;
+    background-color: #451e3e;
+    height: 16vh;
+}
+
+.player {
+    padding: 0;
+}
+
+.player::after {
+    content: '';
+    background-color: #fff;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    border: solid 2px #1a162b;
+}
+
+.start-cell {
+    background-color: #051e3e;
+}
+
+.end-cell {
+    background-color: #851e3e;
+    font-size: 2.5em;
+    text-shadow: 3px 4px 1px #1a162b;
+}
+
+.end-cell::after {
+    content: 'G';
+}
+
+.top-wall {
+    border-top: solid 10px #651e3e;
+}
+
+.bottom-wall {
+    border-bottom: solid 10px #651e3e;
+}
+
+.left-wall {
+    border-left: solid 10px #651e3e;
+}
+
+.right-wall {
+    border-right: solid 10px #651e3e;
+}
