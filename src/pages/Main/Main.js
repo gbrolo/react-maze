@@ -1,5 +1,16 @@
 import React, { Component } from 'react';
+import { Container, Row, Col } from 'reactstrap';
 import './styles.css';
+
+// https://digitalsynopsis.com/design/beautiful-color-palettes-combinations-schemes/
+
+const Cell = (props) =>{
+    return(
+        <div>
+            
+        </div>
+    )
+}
 
 class Main extends Component {
     constructor(props) {
@@ -85,7 +96,17 @@ class Main extends Component {
     render() {
         return (
             <div className="wrapper">
-                
+                <Container style={{
+                    width: '100vh',
+                    height: '100vh',
+                    padding: '20px',
+                    margin: '40px',
+                    backgroundColor: '#251e3e',
+                    boxShadow: '10px 10px #1a162b',
+                    border: 'solid 5px #221c38'
+                }}>
+                    
+                </Container>
             </div>
         );
     }
