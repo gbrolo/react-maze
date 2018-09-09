@@ -15,7 +15,11 @@ const Cell = (props) =>{
             + (props.props.right === "*" ? 'right-wall ' : '')
             + (props.props.type === 'start' ? 'start-cell ' : '')
             + (props.props.type === 'end' ? 'end-cell ' : '')
-            + (props.props.player === true ? 'player' : '') }>
+            + ((props.props.player === true) && (props.props.playerStatus === 'normal') ? 'player' : '')
+            + ((props.props.player === true) && (props.props.playerStatus === 'up') ? 'player-up' : '')
+            + ((props.props.player === true) && (props.props.playerStatus === 'down') ? 'player-down' : '')
+            + ((props.props.player === true) && (props.props.playerStatus === 'left') ? 'player-left' : '')
+            + ((props.props.player === true) && (props.props.playerStatus === 'right') ? 'player-right' : '') }>
         </div>
     )
 }
@@ -56,6 +60,24 @@ class Main extends Component {
         }, 1000);
     }
 
+    animatePlayer(direction, previousIndex) {
+        var maze = this.state.cellsArray;        
+
+        for (var i = 0; i < maze.length; i++) {
+            var currentRow = maze[i];
+            for (var j = 0; j < currentRow.length; j++) {
+                if (maze[i][j].index === previousIndex) {                    
+                    if (direction === 'up') { maze[i][j].playerStatus = 'up' }
+                    else if (direction === 'down') { maze[i][j].playerStatus = 'down' }
+                    else if (direction === 'left') { maze[i][j].playerStatus = 'left' }
+                    else if (direction === 'right') { maze[i][j].playerStatus = 'right' }
+                }
+            }
+        }
+
+        this.setState({ cellsArray: maze });
+    }
+
     updateMaze(previousIndex, nextIndex) {
         var maze = this.state.cellsArray;
         var newCurrentCell = null;
@@ -83,36 +105,40 @@ class Main extends Component {
 
     }
 
-    handleKeyDown() {
+    handleKeyDown() {        
         const currentCell = this.state.currentCell;
         if (currentCell.bottom === " ") {
             this.updateMaze(currentCell.index, currentCell.bottomIndex);
-        }
+            this.animatePlayer('down', currentCell.bottomIndex);
+        }        
     }
 
-    handleKeyUp() {
+    handleKeyUp() {        
         const currentCell = this.state.currentCell;
         if (currentCell.top === " ") {
             this.updateMaze(currentCell.index, currentCell.topIndex);
-        }
+            this.animatePlayer('up', currentCell.topIndex);
+        }        
     }
 
-    handleKeyLeft() {
+    handleKeyLeft() {        
         const currentCell = this.state.currentCell;
         if (currentCell.left === " ") {
             this.updateMaze(currentCell.index, currentCell.leftIndex);
-        }
+            this.animatePlayer('left', currentCell.leftIndex);
+        }        
     }
 
-    handleKeyRight() {
+    handleKeyRight() {        
         const currentCell = this.state.currentCell;
         if (currentCell.right === " ") {
             this.updateMaze(currentCell.index, currentCell.rightIndex);
-        }
+            this.animatePlayer('right', currentCell.rightIndex);
+        }        
     }
     
     buildMaze() {
-        fetch('http://34.210.35.174:3001/?w=5&h=5')
+        fetch('http://34.210.35.174:3001/?w=10&h=10')
             .then(response => {
                 return response.text();
             })
@@ -127,9 +153,9 @@ class Main extends Component {
                     }                    
                 }
 
-                for (var i = 0; i < 11; i++) {
+                for (var i = 0; i < 21; i++) {
                     var newRow = [];
-                    for (var j = 0; j < 11; j++) {
+                    for (var j = 0; j < 21; j++) {
                         if (j % 2 == 0) {
                             var val = array.shift();
                             if (val === '+' || val === '|') { val = "*" }
@@ -151,11 +177,20 @@ class Main extends Component {
                 var cellsArray = [];
                 var index = 0;
 
-                for (var i = 1; i < 11; i++) {
+                for (var i = 1; i < 21; i++) {
                     if (i % 2 != 0) {
                         var row = [];
-                        for (var j = 1; j < 11; j++) {                            
-                            var cell = { index, top: '', bottom: '', left: '', right: '', type: 'path', player: false }
+                        for (var j = 1; j < 21; j++) {                            
+                            var cell = { 
+                                index, 
+                                top: '', 
+                                bottom: '', 
+                                left: '', 
+                                right: '', 
+                                type: 'path', 
+                                player: false,
+                                playerStatus: 'normal'
+                            }
     
                             if (mazeArray[i][j] != '*' && j%2 != 0) {
                                 cell.left = mazeArray[i][j-1];
@@ -216,7 +251,7 @@ class Main extends Component {
                 {this.state.renderMaze && <Container style={{
                     width: '100vh',
                     height: '100vh',
-                    padding: '70px',
+                    padding: '30px',
                     margin: '40px',
                     backgroundColor: '#251e3e',
                     boxShadow: '10px 10px #1a162b',
@@ -274,6 +309,66 @@ class Main extends Component {
                     <Row style={{ boxShadow: '10px 10px #1a162b' }}>
                     {
                         this.state.cellsArray[4].map((cell, index) => {
+                            return(
+                                <Col key={ index } style={{ padding: 0, margin: 0 }}>
+                                    <Cell props={cell} />
+                                </Col>
+                            )
+                        })
+                    }
+                    </Row>
+
+                    <Row style={{ boxShadow: '10px 10px #1a162b' }}>
+                    {
+                        this.state.cellsArray[5].map((cell, index) => {
+                            return(
+                                <Col key={ index } style={{ padding: 0, margin: 0 }}>
+                                    <Cell props={cell} />
+                                </Col>
+                            )
+                        })
+                    }
+                    </Row>
+
+                    <Row style={{ boxShadow: '10px 10px #1a162b' }}>
+                    {
+                        this.state.cellsArray[6].map((cell, index) => {
+                            return(
+                                <Col key={ index } style={{ padding: 0, margin: 0 }}>
+                                    <Cell props={cell} />
+                                </Col>
+                            )
+                        })
+                    }
+                    </Row>
+
+                    <Row style={{ boxShadow: '10px 10px #1a162b' }}>
+                    {
+                        this.state.cellsArray[7].map((cell, index) => {
+                            return(
+                                <Col key={ index } style={{ padding: 0, margin: 0 }}>
+                                    <Cell props={cell} />
+                                </Col>
+                            )
+                        })
+                    }
+                    </Row>
+
+                    <Row style={{ boxShadow: '10px 10px #1a162b' }}>
+                    {
+                        this.state.cellsArray[8].map((cell, index) => {
+                            return(
+                                <Col key={ index } style={{ padding: 0, margin: 0 }}>
+                                    <Cell props={cell} />
+                                </Col>
+                            )
+                        })
+                    }
+                    </Row>
+
+                    <Row style={{ boxShadow: '10px 10px #1a162b' }}>
+                    {
+                        this.state.cellsArray[9].map((cell, index) => {
                             return(
                                 <Col key={ index } style={{ padding: 0, margin: 0 }}>
                                     <Cell props={cell} />
